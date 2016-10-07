@@ -17,7 +17,7 @@ public class ElectionServant extends UnicastRemoteObject implements Election {
 				System.out.println("file exitss!!!!");
         		        FileInputStream fis = new FileInputStream("map.ser");
         		        ObjectInputStream ois = new ObjectInputStream(fis);
-        		        HashMap hm = (HashMap) ois.readObject();
+        		        hm = (HashMap) ois.readObject();
         		        ois.close();
         		}
 		}catch (Exception e){
