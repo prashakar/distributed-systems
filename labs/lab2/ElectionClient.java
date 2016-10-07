@@ -14,12 +14,21 @@ public class ElectionClient {
 		try {
 			Registry registry = LocateRegistry.getRegistry(host, port);
 			Election stub = (Election) registry.lookup("Election");
-			System.out.println("Enter name:");
-			String name = console.nextLine();
-			System.out.println("Enter vote number:");
-			int vote_num = console.nextInt();
-			String response = stub.vote(name,vote_num);
-			System.out.println("response: " + response);
+			System.out.println("Enter desired operation:");
+			String op = console.nextLine();
+			if (op.equals("vote")) {
+				System.out.println("Enter name:");
+				String name = console.nextLine();
+				System.out.println("Enter vote number:");
+				int vote_num = console.nextInt();
+				String response = stub.vote(name,vote_num);
+				System.out.println("response: " + response);
+			} else if (op.equals("results")){
+				System.out.println("Who would you like to see results for:");
+				String name = console.nextLine();
+				double response = stub.result(name);
+				System.out.println("response: " + response);
+			}
 		}catch (Exception e) {
 			System.err.println("ElectionClient exception: " + e.toString());
 			e.printStackTrace();

@@ -8,6 +8,7 @@ import java.io.*;
 public class ElectionServant extends UnicastRemoteObject implements Election {
 	private int count;
 	HashMap hm = new HashMap();
+	ArrayList al = new ArrayList();
 	public ElectionServant() throws RemoteException { count = 0; }
 	
 	public String vote(String name, int number) {
@@ -27,6 +28,16 @@ public class ElectionServant extends UnicastRemoteObject implements Election {
 		if (hm.size() == 0) {
 			System.out.println("new canidate");
 			hm.put(name, new Double(0));
+		}
+		if (al.size() == 0) {
+			al.add(number);
+		} else if (al.contains(number)) {
+			System.out.println("CANNOT VOTE AGAIN " + number);
+			System.exit(0);
+		} else {
+			System.out.println(al);
+			System.out.println("ACCEPTING VOTE " + number);
+			al.add(number);
 		}
 		Set set = hm.entrySet();
 		Iterator i = set.iterator();
@@ -56,12 +67,24 @@ public class ElectionServant extends UnicastRemoteObject implements Election {
                 }catch (Exception e){
                         System.out.println(e.getClass());
                 }
-		return "Vote for " + name + " recorded and is now: " + Integer.toString(hm.size());
+		return "Vote for " + name + " recorded and is now recorded";
 //+ " is " + Double.toString(new_vote_count);
 	}
 	public double result(String name) {
 		System.out.println("Requesting votes for" + name);
 		double num_votes = 0;
+		try{
+			File f = new File("map.ser");
+        		if (f.exists() && !f.isDirectory()) {
+				System.out.println("file exitss!!!!");
+        		        FileInputStream fis = new FileInputStream("map.ser");
+        		        ObjectInputStream ois = new ObjectInputStream(fis);
+        		        hm = (HashMap) ois.readObject();
+        		        ois.close();
+        		}
+		}catch (Exception e){
+			System.out.println(e.getClass());
+		}
 		if (hm.size() == 0) {
 			System.out.println("no votes recorded at all");
 			num_votes = 0;
