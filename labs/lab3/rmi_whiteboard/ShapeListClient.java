@@ -8,8 +8,10 @@ import java.awt.Color;
 
 public class ShapeListClient{
 	   public static void main(String args[]){
-		   	String host = args[0];
-			int port = Integer.parseInt(args[1]);
+		   	String client_host = args[0];
+			System.setProperty("java.rmi.server.hostname", client_host);
+		   	String host = args[1];
+			int port = Integer.parseInt(args[2]);
 			try{
 			Registry registry = LocateRegistry.getRegistry(host, port);
 			ShapeList aList = (ShapeList) registry.lookup("ShapeList");
