@@ -10,37 +10,50 @@ public class ShapeListClient{
 	   public static void main(String args[]){
 		   	String host = args[0];
 			int port = Integer.parseInt(args[1]);
+			try{
+			Registry registry = LocateRegistry.getRegistry(host, port);
+			ShapeList aList = (ShapeList) registry.lookup("ShapeList");
+			System.out.println("Found server");
+			System.out.println("registering for callback");
+			WhiteboardCallback wbcb = new WhiteboardCallbackServant();
+			System.out.println(wbcb);
+			int client_reg = aList.register(wbcb);
+			System.out.println("Client registered at: " + client_reg);
 			while(true){
-				String option = "read";
+				String option = "";
 				String type = "rectangle";
+				Vector<Shape> shapeVec = aList.allShapes();
+				System.out.println("Got vector");
 				Scanner scanner = new Scanner(System.in);
-				System.out.println("-------------------\nEnter request type (read/write)");
-				option = scanner.nextLine();
+				do{
+					System.out.println("-------------------\nEnter request type (read/write/exit)");
+					option = scanner.nextLine();
+				} while (option.equals(""));
 				System.out.println("Enter shape type (rectangle/circle)");
 				type = scanner.nextLine();
 				System.out.println("option = " + option + ", shape = " + type);
-
-				try {
-					Registry registry = LocateRegistry.getRegistry(host, port);
-					ShapeList aList = (ShapeList) registry.lookup("ShapeList");
-					System.out.println("Found server");
-					Vector<Shape> shapeVec = aList.allShapes();
-					System.out.println("Got vector");
-					if(option.equals("read")){
-						for(int i = 0; i < shapeVec.size(); i++){
-							GraphicalObject g = ((Shape)shapeVec.elementAt(i)).getAllState();
-							g.print();
-						}
-					} else {
-						GraphicalObject g = new GraphicalObject(type, 
-							new Rectangle(50,50,300,400), Color.red, Color.blue, false);
-						System.out.println("Created graphical object");
-						aList.newShape(g);
-						System.out.println("Stored shape with ShapeList object on server");
+				if(option.equals("read")){
+					for(int i = 0; i < shapeVec.size(); i++){
+						GraphicalObject g = ((Shape)shapeVec.elementAt(i)).getAllState();
+						g.print();
 					}
-				}catch(RemoteException e) {System.out.println("allShapes: " + e.getMessage());
-				}catch(Exception e) {System.out.println("Registry: " + e.getMessage());
-				}	
+				} else if (option.equals("exit")) {
+					System.out.println("exiting now");
+					aList.unregister(client_reg);
+					System.exit(0);
+				} else if (option.equals("write")){
+					GraphicalObject g = new GraphicalObject(type, 
+					new Rectangle(50,50,300,400), Color.red, Color.blue, false);
+					System.out.println("Created graphical object");
+					aList.newShape(g);
+					System.out.println("Stored shape with ShapeList object on server");
+				} else {
+					System.out.println();
+					continue;
+				}
 			}
+			}catch(RemoteException e) {System.out.println("allShapes: " + e.getMessage());
+			}catch(Exception e) {System.out.println("Registry: " + e.getMessage());
+			}	
 	}
 }
