@@ -7,11 +7,15 @@ public class ShapeListServant extends UnicastRemoteObject implements ShapeList {
 	private Vector<Shape> theList;
 	private int version;
 	private List<WhiteboardCallback> clients;
-	
+	private HashMap<Integer,WhiteboardCallback> hm;
+	private int callbackId;
+
 	public ShapeListServant() throws RemoteException{
 		theList = new Vector<Shape>();
 		clients = new ArrayList<WhiteboardCallback>();
+		hm = new HashMap<Integer,WhiteboardCallback>();
 		version = 0;
+		callbackId = 0;
 	}
 
 	public Shape newShape(GraphicalObject g) throws RemoteException{
@@ -23,24 +27,17 @@ public class ShapeListServant extends UnicastRemoteObject implements ShapeList {
 	}
 
 	public int register(WhiteboardCallback callback) throws RemoteException{
-		Random rn = new Random();
-		int callbackId = rn.nextInt();
-		clients.add(callback);
-		System.out.println(callback);
+		callbackId+=1;
+		hm.put(callbackId, callback);
+		//clients.add(callback);
+		System.out.println("Client registered");
 		//callback.callback(version);
 		return callbackId;
 	}
 
 	public int unregister(int callbackId) throws RemoteException {
-		Iterator itr = clients.iterator();
-		int strElement = 0;
-		while(itr.hasNext()){
-			strElement = (int)itr.next();
-			if(strElement == callbackId){
-				itr.remove();
-				break;
-			}
-		}
+		hm.remove(callbackId);
+		System.out.println("Client unregistered");
 		return 1;
 	}
 
@@ -49,9 +46,11 @@ public class ShapeListServant extends UnicastRemoteObject implements ShapeList {
 	}
 
 	public void getVersion() throws RemoteException{
-		Iterator<WhiteboardCallback> itr = clients.iterator();
-		while(itr.hasNext()){
-			WhiteboardCallback element = itr.next();
+		Set set = hm.entrySet();
+		Iterator i = set.iterator();
+		while(i.hasNext()){
+			Map.Entry me = (Map.Entry)i.next();
+			WhiteboardCallback element = (WhiteboardCallback)me.getValue();
 			element.callback(version);
 			//callback.callback(version);
                 }

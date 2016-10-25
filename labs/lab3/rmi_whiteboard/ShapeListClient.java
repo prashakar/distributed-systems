@@ -31,6 +31,11 @@ public class ShapeListClient{
 					System.out.println("-------------------\nEnter request type (read/write/exit)");
 					option = scanner.nextLine();
 				} while (option.equals(""));
+				if (option.equals("exit")) {
+					System.out.println("exiting now");
+					aList.unregister(client_reg);
+					System.exit(0);
+				}
 				System.out.println("Enter shape type (rectangle/circle)");
 				type = scanner.nextLine();
 				System.out.println("option = " + option + ", shape = " + type);
@@ -39,10 +44,6 @@ public class ShapeListClient{
 						GraphicalObject g = ((Shape)shapeVec.elementAt(i)).getAllState();
 						g.print();
 					}
-				} else if (option.equals("exit")) {
-					System.out.println("exiting now");
-					aList.unregister(client_reg);
-					System.exit(0);
 				} else if (option.equals("write")){
 					GraphicalObject g = new GraphicalObject(type, 
 					new Rectangle(50,50,300,400), Color.red, Color.blue, false);
